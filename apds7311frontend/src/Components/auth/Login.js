@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function Login() {
   const [username, setUsername] = useState('Rico');
@@ -18,14 +19,14 @@ headers:{'Content-Type':'application/json'},
 body: JSON.stringify({username,password})
 });
 
-const data =await response.json();
+const data = await response.json();
 
-if (data.error){
+  if (data.error){
 
-  setError(data.error)
-}else{
-localStorage.setItem('tokem',data.token);
-window.location.href ='/ProtectedPage';
+    setError(data.error)
+  }else{
+  localStorage.setItem('token',data.token);
+  window.location.href ='/ProtectedPage';
 }
 
 }
@@ -42,14 +43,20 @@ catch (err){
   };
   return (
     <>
-      <h1>Hello</h1>
+
       <form onSubmit={handleSubmit}>
         <label>Username:</label>
         <input name ='Oops' autoComplete='true'
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}  // Update the username state
-        />
+        /><br/>
+        <label>Account Number:</label>
+        <input name ='Oops' autoComplete='true'
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}  // Update the username state
+        /><br/>
         <label>Password:</label>
         <input
           type="password"
@@ -57,8 +64,18 @@ catch (err){
           onChange={(e) => setPassword(e.target.value)}  // Update the password state
         />
         {error && <p style={{ color: 'red' }}>{error}</p>}
+        <br/>
         <button type="submit">Login</button>
       </form>
+      <br/>
+      
+      <div>
+            <Link to="/registration">
+                <label style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}>
+                    Click here to go to Target Page
+                </label>
+            </Link>
+        </div>
     </>
   );
 }

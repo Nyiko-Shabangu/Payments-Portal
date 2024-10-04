@@ -29,6 +29,8 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 // Routes
 app.use('/api', postRoutes);
 app.use('/api/auth', authRoutes);
+// Define the route to get the data
+
 
 // // SSL options
 // const options = {
