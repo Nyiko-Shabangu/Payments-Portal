@@ -34,19 +34,22 @@ function Admin() {
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Email</th>
-                        <th>Age</th>
-                        {/* Add more fields as per your data structure */}
+                        <th>Surname</th>
+                        <th>Username</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {data.map((item) => (
                         <tr key={item._id}>
+                            <td>{item._id}</td>
                             <td>{item.name}</td>
                             <td>{item.surname}</td>
                             <td>{item.username}</td>
-                            <td><button>Approve Payment</button></td>
-                            <td><button>View customer information</button></td>
+                            <td>
+                                <button>Approve Payment</button>
+                                <button>View Customer Information</button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>

@@ -6,7 +6,7 @@ import Protected from './Components/ProtectedPage';
 import NavigationBar from './Components/commonDenominator/navigationBar.js';
 import Hello from './Components/commonDenominator/header.js';
 import TransactionPage from './Components/post/TransactionPage.js';
-import Registeration from './Components/auth/Registeration.js';
+import Registeration from './Components/auth/registeration';
 import Phello from './Components/Admin.js';
 
 function App() {

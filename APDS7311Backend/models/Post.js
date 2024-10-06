@@ -6,11 +6,11 @@ const postSchema =  new mongoose.Schema({
         required:true,
         unique:true
     },
-    postImage:{
-        type:string,
-        required:true,
-        trim:true,
-        default:"image URL"
+    postImage: {
+        type: string,
+        required: true,
+        trim: true,
+        default: "image URL"
 
     },
     content:{

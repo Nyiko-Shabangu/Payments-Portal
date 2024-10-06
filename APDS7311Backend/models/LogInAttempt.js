@@ -5,7 +5,9 @@ import mongoose from "mongoose";
     username:{
         type:String,
         required:true,
-        immuatble:true
+        immuatble:true,//cannot be changed
+        trim:true,
+        match: [/^[a-zA-Z0-9_]+$/, "Only alphanumeric characters are allowed"]
     },
     successfullLogin:{
         type:Boolean,
@@ -20,9 +22,18 @@ import mongoose from "mongoose";
     TimeStamp:{ 
         type:Date,
         default: Date.now,
-        immutable:true
-    }
+        immutable:true,
+       // expires: '7d', // Token expires in 7 days
+    },
 
-    });
+    //userType: {
+    //    type: String,
+   //     required: true,
+    //    enum: ['Customer', 'Employee']
+   // }
+
+    },
+);
+
 /*Hello*/
 export default mongoose.model("LogInAttempt",LogInSchema); 

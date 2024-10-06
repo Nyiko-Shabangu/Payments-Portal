@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js'; // Assuming this is where the User model is
 import jwt from 'jsonwebtoken';
 import Transaction from '../models/Transaction.js';
-//import bruteforce from '';
-
+import bruteforceProtection from '../middleware/bruteforceProtection.js';
+//import loginAttempt from '../middleware/Loginatemptauth.js';
 
 const router = express.Router();
 const JWM_Secret = process.env.JWMSecret;
@@ -29,6 +29,10 @@ router.post('/registration', async (req, res) => {
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        //salt
+       // const salt = await bcrypt.genSalt(10);
+        //const hashedPassword = await bcrypt.hash(password, salt);   
 
         // Create and save the new user
         const newUser = new User({ name,surname,username,idNumber,accountNumber, password: hashedPassword });
@@ -63,8 +67,8 @@ try{
 
 
 
-
-router.post('/login',async (req,res) => {
+// login with brute force protection
+router.post('/login' , bruteforceProtection.prevent , async (req,res) => {
 
     try {
 
@@ -73,25 +77,75 @@ router.post('/login',async (req,res) => {
         const user = await User.findOne({ username});
         
         if(!user){
-            return res.status(201).json({message:'User not found', error: err.message})
-        } 
+            return res.status(404).json({message:'User not found', error: err.message})
+        }  
 
+        //unsalt the password
+        //const unsaltedPassword = await bcrypt.unsalt(password);
+        
+        
+        //check the password
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
-            return res.status(201).json({message:'User not found', error: err.message})
+            return res.status(404).json({message:'Incorrect password', error: err.message})
         } 
 
+       
 
-
+        //create a token
         const token = jwt.sign({id:user._id}, JWM_Secret,{expiresIn: '1h'});
 
         res.json({token});
        // return res.status(201).json({message:'Successfull login', error: err.message})
     }catch(err){
 
-        return res.status(400).json({message:'Failed to login', error: err.message})
+        return res.status(500).json({message:'Failed to login', error: err.message})
 
     }
+
+
+
+    //employee login    
+    //router.post('/employee-login', bruteforceProtection, async (req, res) => {
+       // const { username, password } = req.body;
+    
+      //  try {
+       //     const employee = await Employee.findOne({ username });
+       //     if (!employee) {
+      //          return res.status(400).json({ msg: 'Invalid credentials' });
+       //     }
+    
+        //    const isMatch = await bcrypt.compare(password, employee.password);
+        //    if (!isMatch) {
+        //          return res.status(400).json({ msg: 'Invalid credentials' });
+        //     }
+    
+            // Generate JWT for employee
+            //const token = jwt.sign({ employeeId: employee._id, role: employee.role }, 'yourSecretKey', { expiresIn: '1h' });
+            //res.json({ token });
+        //} catch (error) {
+           // console.error(error.message);
+            //res.status(500).send('Server error');   
+        //}
+   //}); 
+
+// Log a login attempt (for logging purposes)
+//router.post('/log-login-attempt', async (req, res) => {
+    //const { username, successfullLogin, IPadress } = req.body;
+
+   // try {
+     //   const logInAttempt = new LogInAttempt({
+       //     username,
+       //     successfullLogin,
+      //      IPadress
+      //  });
+
+      //  await logInAttempt.save();
+     //   res.status(201).json({ msg: 'Login attempt logged' });
+    //} catch (error) {
+    //    console.error(error.message);
+    //    res.status(500).send('Server error');
+    //}
 
 
 

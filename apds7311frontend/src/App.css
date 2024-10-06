@@ -1,3 +1,10 @@
+:root {
+  --primary-color: #282c34;
+  --accent-color: #61dafb;
+  --text-color: white;
+  --font-size-large: calc(10px + 2vmin);
+}
+
 .App {
   text-align: center;
 }
@@ -9,30 +16,55 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    animation: App-logo-spin infinite 10s linear; /* Reduced spin duration */
   }
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--primary-color);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  font-size: var(--font-size-large);
+  color: var(--text-color);
 }
 
 .App-link {
-  color: #61dafb;
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+.App-link:hover, 
+.App-link:focus {
+  color: white; /* Change link color on hover/focus */
 }
 
 @keyframes App-logo-spin {
-  from {
+  0% {
     transform: rotate(0deg);
   }
-  to {
+  100% {
     transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .App-logo {
+    animation: none; /* Disable animation for reduced motion preference */
+  }
+}
+
+/* Optional media query for small screens */
+@media (max-width: 768px) {
+  .App-header {
+    font-size: calc(8px + 2vmin); /* Adjust font-size for smaller screens */
+    padding: 20px;
+  }
+
+  .App-logo {
+    height: 30vmin; /* Reduce logo size for smaller screens */
   }
 }

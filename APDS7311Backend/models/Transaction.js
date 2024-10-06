@@ -28,4 +28,14 @@ const transactionSchema = new mongoose.Schema({
 
 });
 
+
+// Method to update payment status
+//paymentSchema.methods.verifyPayment = function (employeeId) {
+    //this.paymentStatus = 'Verified';
+  //  this.verifiedBy = employeeId;
+//    this.verifiedAt = Date.now();
+ // };
+  
+//  const Payment = mongoose.model('Payment', paymentSchema);
+
 export default mongoose.model("Transaction", transactionSchema);
