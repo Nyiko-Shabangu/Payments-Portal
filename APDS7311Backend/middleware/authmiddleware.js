@@ -46,13 +46,10 @@ const authmiddleware = async (req, res, next) => {
      } else if(decoded.role === 'customer'){
 
             const customer = await Customer.findById(customerId);
-
             if (!customer) {
                 return res.status(401).json({ msg: 'Customer not found' });
             }
-
-            req.customer = customer;
-           
+            req.customer = customer;     
         } 
         
         else {
@@ -77,24 +74,6 @@ const authmiddleware = async (req, res, next) => {
         }
         }
     
-
-
-//backup code
-   // try {
-   //     const decoded = jwt.verify(token, 'yourSecretKey');
-   //     const employeeId = decoded.employeeId;
-   //     const employee = await Employee.findById(employeeId);
-   //     if (!employee) {
-        //    return res.status(401).json({ msg: 'Employee not found' });
-        //}
-
-      //  req.employee = employee;
-      //  next();
-    //} catch (error) {
-    //    console.error(error.message);
-    //    res.status(500).send('Server error');
-    //}
 };
 
 export default authmiddleware;
-

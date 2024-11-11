@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
     const LogInSchema = new mongoose.Schema({
     username:{
         type:String,
@@ -35,5 +34,5 @@ import mongoose from "mongoose";
     },
 );
 
-/*Hello*/
+
 export default mongoose.model("LogInAttempt",LogInSchema); 

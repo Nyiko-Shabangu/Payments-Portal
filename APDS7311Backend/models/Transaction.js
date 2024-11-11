@@ -1,28 +1,37 @@
 import mongoose from 'mongoose';
 
 const transactionSchema = new mongoose.Schema({
-    /*userUsername:{
+    userUsername:{
         type:String,
+        trim: true,
         required :true
-    },*/
+    },
     amount: {
         type: String,
-        required: true
+        trim: true,
+        required: true,
+        match: [/^[0-9]+$/, "Only numeric characters are allowed."] // Allows only numbers
     },
     currency: {
         type: String,
-        required: true
+        trim: true,
+        required: true // Only alphanumeric characters are allowed
     },
     provider: {
         type: String,
-        required: true
+        trim: true,
+        required: true,
+        match: [/^[a-zA-Z]+$/, "Only alphabetical characters are allowed."] // Only alphanumeric characters are allowed
     },
     accountnumber: {
         type: String,
-        required: true
+        trim: true,
+        required: true,
+        match: [/^[0-9]+$/, "Only numeric characters are allowed."] // Allows only numbers
     },
     swiftcode: {
         type: String,
+        trim: true,
         required: true
     }
 

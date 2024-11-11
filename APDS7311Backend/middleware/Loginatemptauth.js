@@ -1,6 +1,5 @@
 import loginAttemptSchema from '../models/LogInAttempt';
 
-
 export const loginAttempt = async (req, res, next) => {
     const originalJson = res.json;
     res.json = async function (data) {

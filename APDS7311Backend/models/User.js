@@ -1,47 +1,44 @@
 import mongoose from 'mongoose';
-//todo add bcrypt
-//todo add jwt
-//todo add hashing 
-
-
-//const mongoose = require('mongoose');
-//const bcrypt = require('bcrypt');
-
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    trim: true,
+    required: true,
+    match: [/^[a-zA-Z]+$/, "Only alphabetical characters are allowed."] // Only alphanumeric characters are allowed
   },
   surname: {
-  type: String,
-  required: true
+    type: String,
+    trim: true,
+    required: true,
+    match: [/^[a-zA-Z]+$/, "Only alphabetical characters are allowed."] // Only alphanumeric characters are allowed
   },  
   username: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        match: [/^[a-zA-Z0-9_]+$/, "Only alphanumeric characters are allowed"] // Only alphanumeric characters are allowed
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
   },
   idNumber: {
-        type: String,
-        required: true
-    },
+    type: String,
+    trim: true,
+    required: true,
+    match: [/^[0-9]+$/, "Only numeric characters are allowed."] // Allows only numbers
+  },
   accountNumber: {
-      type: String,
-      required: true
+    type: String,
+    trim: true,
+    required: true,
+    match: [/^[0-9]+$/, "Only numeric characters are allowed."] // Allows only numbers
   },
   password: {
-      type: String,
-      required: true
-  },
-    email: {
-        type: String,
-       required: true,
-        unique: true,
-        trim: true,
-      // match: [/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/, 'Please enter a valid email address']// Regular expression for email validation
+    type: String,
+    trim: true,
+    required: true
+  },role:{
+    type: String,
+    required: true,
+    trim: true
     }
 });
 

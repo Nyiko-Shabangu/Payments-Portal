@@ -1,92 +1,202 @@
-import React, {useState} from 'react';
-
+import React, {useState, useEffect} from 'react';
+import './Transaction.css';
+import MessageBox from './MessageBox.js';
 
 function TransactionPage() {
-
-  const [amount, setAmount] = useState('Rico');
-  const [currency, setCurrency] = useState('');
-  const [provider, setProvider] = useState('');
+  
+  //UseState Hooks Declared
+  const [amount, setAmount] = useState('');
   const [accountnumber, setAccountNumber] = useState('');
   const [swiftcode, setSwiftCode] = useState('');
   const [error, setError] = useState('');
+  const [selectedOptionProvider, setSelectedOptionProvider] = useState('');
+  const [selectedOptionCurrency, setSelectedOptionCurrency] = useState('');
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [successTransaction,setSucessTransaction] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();  // No argument needed here
-    setError('');
-    // Add your logic for login submission here
+  const handleCloseMessage = () =>{setSucessTransaction(false)};
+
+  //React Hook
+  useEffect(() => {
+
+    // Retrieve token from local storage
+    const token = localStorage.getItem('token'); 
+
+    // Get user role from local storage
+    const userTypeFromStorage = localStorage.getItem('role'); 
     
-try {
+    //Display default message on submission form
+    setSelectedOptionProvider('Please Select Provider')
+    setSelectedOptionCurrency('Please Select Currency');
 
+    //if token is succefull retriev and not null 
+    if (token != null && userTypeFromStorage === 'Client') {
+      
+        //validate the token
+        fetch('https://localhost:5000/api/auth/verify-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Send token in Authorization header
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json(); // Token is valid
+            } else {
+              throw new Error('Token is invalid or expired');
+            }
+          })
+          .then((data) => {
+            // You can do something with the valid response if necessary
+            console.log('Token verified successfully:', data);
+            setUnauthorized(true); // Token is valid, allow access
+          })
+          .catch((error) => {
+            console.error('Error verifying token:', error);
+            setUnauthorized(false); // Token is invalid, deny access
+            window.location.href = '/fail'; // Redirect to the fail page
+          });
 
-const response = await fetch('http://localhost:5000/api/auth/transaction',{
-method:'POST',
-headers:{'Content-Type':'application/json'},
-body: JSON.stringify({amount,currency,provider,accountnumber,swiftcode})
-});
+    } else {
+      
+      setUnauthorized(false);
 
-const data =await response.json();
+      //navigate user to unaothorized page
+      window.location.href ='/fail';
+    
+    }
+  }, []);
 
-if (data.error){
+const handleChangeProvider = (e) => {
+  setSelectedOptionProvider(e.target.value);
+};
 
-  setError(data.error)
-}else{
-localStorage.setItem('token',data.token);
-//window.location.href ='/ProtectedPage';
-}
+const handleChangeCurrency = (e) => {
+  setSelectedOptionCurrency(e.target.value);
+};
 
-}
-catch (err){
-  if (err.response){
+const handleSubmit = async (e) => {
+  
+  //prohids the form from resetting
+  e.preventDefault();
+  
+  //retrieve username to includ along post information 
+  const userName = localStorage.getItem('userName');
+  
+  try {
+    
+    //https post
+    const response = await fetch('https://localhost:5000/api/auth/transaction', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' 
+      },
+      //send user inputs to backend
+      body: JSON.stringify({ selectedOptionProvider, selectedOptionCurrency, accountnumber, amount, swiftcode, userName }),
+    });
 
-  setError(err.response.data.message);
-
-  }else{
-    setError('Something went wrong. PLease try again ')
+  
+    // Check if response is ok
+    if (!response.ok) {
+      const data = await response.json();
+      setError(data.error || 'Failed to process transaction');
+      return;
+    
+    }else{
+      //reset all hooks for resubmission of tranaction form
+      setSucessTransaction(true)
+      setAmount('')
+      setSwiftCode('')
+      setAccountNumber('')
+      setSelectedOptionProvider('')
+      setSelectedOptionCurrency('')
+      setError('')
+    }
+  } catch (err) {
+    setError('Something went wrong. Please try again.');
   }
+};
 
-}
-  };
-  return (
-    <>
+return (
+<>
+  {/*Check if user is authorized*/}   
+  {unauthorized ? (
+    <div className="transaction-container">  
+      <div className="transaction-box">
+        <h2>Transaction Form</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="input-group">
+              <label>Select Provider:</label>
+              <select value={selectedOptionProvider} onChange={handleChangeProvider}>
+                <option value="">Select a provider</option>
+                <option value="Swift">Swift</option>
+                <option value="Paypal">Paypal</option>
+                <option value="GlobalACH">Global ACH</option>
+              </select>
+              <p style={{ color: 'green'}}>Selected Option: {selectedOptionProvider}</p>
+            </div>
 
-      <form onSubmit={handleSubmit}>
-      <label>AccountNumber:</label>
-        <input name ='Oops' autoComplete='true'
-          type="text"
-          value={accountnumber}
-          onChange={(e) => setAccountNumber(e.target.value)}  // Update the username state
-        /> <br/>
-         <label>provider:</label>
-        <input name ='Oops' autoComplete='true'
-          type="text"
-          value={provider}
-          onChange={(e) => setProvider(e.target.value)}  // Update the username state
-        /> <br/>
-        <label>Choose currency:</label>
-        <input name ='Oops' autoComplete='true'
-          type="text"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}  // Update the username state
-        /> <br/>
-        <label>Amount:</label>
-        <input
-          type="password"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}  // Update the password state
-        /><br/>
-        <label>SwiftCode:</label>
-        <input name ='Oops' autoComplete='true'
-          type="text"
-          value={swiftcode}
-          onChange={(e) => setSwiftCode(e.target.value)}  // Update the username state
-        />
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <br/>
-        <button type="submit">Process</button>
-      </form>
-    </>
+            <div className="input-group">
+              <label>Select Currency:</label>
+              <select value={selectedOptionCurrency} onChange={handleChangeCurrency}>
+                <option value="">Select a currency</option>
+                <option value="Zar">Zar</option>
+                <option value="USDollar">US Dollar</option>
+                <option value="BritishPound">British Pound</option>
+              </select>
+              <p style={{ color: 'green' }}>Selected Option: {selectedOptionCurrency}</p>
+            </div>
+
+            <div className="input-group">
+              <label>Account Number:</label>
+              <input
+                type="text"
+                value={accountnumber}
+                maxLength={10}
+                onChange={(e) => setAccountNumber(e.target.value)}
+              />
+            </div>
+
+            <div className="input-group">
+              <label>Choose Amount:</label>
+              <input
+                type="text"
+                value={amount}
+                maxLength={10}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
+
+            <div className="input-group">
+              <label>Code:</label>
+              <input
+                type="text"
+                maxLength={10}
+                value={swiftcode}
+                onChange={(e) => setSwiftCode(e.target.value)}
+              />
+            </div>
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <button type="submit" className="transaction-btn">Process</button>
+          </form>
+        </div>
+      </div>    
+    ) : (
+      <div>
+        <h2>Unauthorized Access</h2>
+        <p>You do not have permission to view this page.</p>
+      </div>
+    )}  
+  
+  {successTransaction && (
+    <MessageBox
+      message="Transaction has successfully been posted!"
+      onClose={handleCloseMessage}
+      type="success"/>  
+  )}
        
-    );
-  }
+</>
+);}
 
-  export default TransactionPage;
+export default TransactionPage;
