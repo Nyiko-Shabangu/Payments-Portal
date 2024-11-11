@@ -1,4 +1,4 @@
-Nimport React, { useState, useEffect } from 'react'; // Make sure to import useEffect and useState
+import React, { useState, useEffect } from 'react'; // Make sure to import useEffect and useState
 import { Link, useNavigate } from 'react-router-dom';
 import './Navigationbar.css'
 
