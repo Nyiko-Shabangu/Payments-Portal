@@ -1,13 +1,9 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# For more details, see: https://circleci.com/docs/configuration-reference
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# For more details, see: https://circleci.com/docs/configuration-reference
 version: 2.1
 
 # Define jobs for the CircleCI configuration.
 # Each job specifies a series of commands executed in the context of a defined Docker image.
 jobs:
-      
+  
   # A simple "say-hello" job to demonstrate a basic CircleCI step.
   say-hello:
     docker:
@@ -38,13 +34,6 @@ jobs:
           command: |
             cd APDS7311Backend
             npm install
-
-      # # Perform an audit to check for vulnerabilities in backend dependencies.
-      # - run:
-      #     name: Audit Dependencies for Vulnerabilities
-      #     command: |
-      #       cd APDS7311Backend
-      #       npm audit  # This checks for known security vulnerabilities
 
       # Install frontend dependencies.
       - run:
@@ -77,9 +66,9 @@ jobs:
       - store_artifacts:
           path: apds7311frontend/build.log
           destination: frontend-build-log
-            
+
   # Define the 'sonarqube' job for running SonarQube static code analysis.
- sonarqube:
+  sonarqube:
     docker:
       - image: sonarsource/sonar-scanner-cli:latest
     steps:
@@ -104,34 +93,10 @@ jobs:
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
 
-
-    
-
-
-  # # Define the 'security-scan' job for static analysis of the code.
-  # security-scan:
-  #   docker:
-  #     # Use a basic image for running static analysis.
-  #     - image: cimg/base:current
-
-  #   steps:
-  #     # Check out the code from the repository.
-  #     - checkout
-
-  #     # Run a static analysis security tool (SAST).
-  #     # ESLint is used here as an example; you can replace it with your preferred SAST tool.
-  #     - run:
-  #         name: Run SAST
-  #         command: |
-  #           npx eslint .  # ESLint is used for static code analysis (you can swap with any SAST tool)
-
 # Define the workflow, which orchestrates the jobs defined above.
 workflows:
   build-workflow:
     jobs:
       - say-hello  # This runs the basic "say hello" job.
       - build      # This triggers the 'build' job for both backend and frontend tasks.
-      - sonarqube
-      # - security-scan:
-      #     requires:
-      #       - build  # Ensures that the security scan runs only after the 'build' job is complete.
+      - sonarqube  # Runs the SonarQube job for static analysis.
