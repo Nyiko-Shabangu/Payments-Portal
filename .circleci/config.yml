@@ -1,3 +1,4 @@
+
 # Use the latest 2.1 version of CircleCI pipeline process engine.
 # For more details, see: https://circleci.com/docs/configuration-reference
 # Use the latest 2.1 version of CircleCI pipeline process engine.
@@ -7,7 +8,7 @@ version: 2.1
 # Define jobs for the CircleCI configuration.
 # Each job specifies a series of commands executed in the context of a defined Docker image.
 jobs:
-      
+  
   # A simple "say-hello" job to demonstrate a basic CircleCI step.
   say-hello:
     docker:
@@ -79,7 +80,7 @@ jobs:
           destination: frontend-build-log
             
   # Define the 'sonarqube' job for running SonarQube static code analysis.
-   sonarqube:
+  sonarqube:
     docker:
       - image: sonarsource/sonar-scanner-cli:latest
     steps:
@@ -89,7 +90,7 @@ jobs:
       - run:
           name: Run SonarQube Scanner
           command: |
-            SONAR_BRANCH="${CIRCLE_BRANCH:-main}"
+            SONAR_BRANCH="${CIRCLE_BRANCH:-master}"
             echo "Sonar branch value is: $SONAR_BRANCH"
             echo "Sonar org value is: $SONAR_ORG"
             sonar-scanner \
@@ -103,8 +104,9 @@ jobs:
               -Dsonar.login="$SONAR_TOKEN" \
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
+    
 
-  
+
   # # Define the 'security-scan' job for static analysis of the code.
   # security-scan:
   #   docker:
