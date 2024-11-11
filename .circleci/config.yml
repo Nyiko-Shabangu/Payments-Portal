@@ -7,11 +7,6 @@ version: 2.1
 # Define jobs for the CircleCI configuration.
 # Each job specifies a series of commands executed in the context of a defined Docker image.
 jobs:
-  # Define executors (reusable job environments).
-executors:
-  node-executor:
-    docker:
-      - image: circleci/node:14
       
   # A simple "say-hello" job to demonstrate a basic CircleCI step.
   say-hello:
