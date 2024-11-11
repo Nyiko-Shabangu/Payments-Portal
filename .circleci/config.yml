@@ -1,0 +1,140 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# For more details, see: https://circleci.com/docs/configuration-reference
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# For more details, see: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+# Define jobs for the CircleCI configuration.
+# Each job specifies a series of commands executed in the context of a defined Docker image.
+jobs:
+  # Define executors (reusable job environments).
+executors:
+  node-executor:
+    docker:
+      - image: circleci/node:14
+      
+  # A simple "say-hello" job to demonstrate a basic CircleCI step.
+  say-hello:
+    docker:
+      # Using a lightweight base image provided by CircleCI for basic commands.
+      - image: cimg/base:current
+
+    steps:
+      # First, check out the code from the repository.
+      - checkout
+      # A simple shell command that prints "Hello, World!".
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
+
+  # Define the 'build' job to handle dependencies, audits, and tests for both backend and frontend.
+  build:
+    docker:
+      # Use the appropriate Node.js image from CircleCI for backend and frontend builds.
+      - image: circleci/node:14
+
+    steps:
+      # Check out the code from the repository.
+      - checkout
+
+      # Install backend dependencies using npm.
+      - run:
+          name: Install Backend Dependencies
+          command: |
+            cd APDS7311Backend
+            npm install
+
+      # # Perform an audit to check for vulnerabilities in backend dependencies.
+      # - run:
+      #     name: Audit Dependencies for Vulnerabilities
+      #     command: |
+      #       cd APDS7311Backend
+      #       npm audit  # This checks for known security vulnerabilities
+
+      # Install frontend dependencies.
+      - run:
+          name: Install Frontend Dependencies
+          command: |
+            cd apds7311frontend
+            npm install
+
+      # Run tests for the backend.
+      - run:
+          name: Run Tests
+          command: |
+            cd APDS7311Backend
+            npm test  # Assumes tests are already set up in the backend
+
+      # Build the frontend assets.
+      - run:
+          name: Build Frontend
+          command: |
+            cd apds7311frontend
+            echo "Node version: $(node -v)"
+            echo "NPM version: $(npm -v)"
+            CI=false npm run build 2>&1 | tee build.log
+          when: always
+
+      # Store frontend build artifacts
+      - store_artifacts:
+          path: apds7311frontend/build
+          destination: frontend-build
+      - store_artifacts:
+          path: apds7311frontend/build.log
+          destination: frontend-build-log
+            
+  # Define the 'sonarqube' job for running SonarQube static code analysis.
+  sonarqube:
+    docker:
+      - image: sonarsource/sonar-scanner-cli:latest
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Run SonarQube Scanner
+          command: |
+            SONAR_BRANCH="${CIRCLE_BRANCH:-master}"
+            echo "Sonar branch value is: $SONAR_BRANCH"
+            echo "Sonar org value is: $SONAR_ORG"
+            sonar-scanner \
+              -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+              -Dsonar.organization="$SONAR_ORG" \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.exclusions="**/android/**,**/ios/**" \
+              -Dsonar.c.file.suffixes=- \
+              -Dsonar.cpp.file.suffixes=- \
+              -Dsonar.objc.file.suffixes=- \
+              -Dsonar.login="$SONAR_TOKEN" \
+              -Dsonar.branch.name="$SONAR_BRANCH" \
+              -Dsonar.sources="."
+    
+
+
+  # # Define the 'security-scan' job for static analysis of the code.
+  # security-scan:
+  #   docker:
+  #     # Use a basic image for running static analysis.
+  #     - image: cimg/base:current
+
+  #   steps:
+  #     # Check out the code from the repository.
+  #     - checkout
+
+  #     # Run a static analysis security tool (SAST).
+  #     # ESLint is used here as an example; you can replace it with your preferred SAST tool.
+  #     - run:
+  #         name: Run SAST
+  #         command: |
+  #           npx eslint .  # ESLint is used for static code analysis (you can swap with any SAST tool)
+
+# Define the workflow, which orchestrates the jobs defined above.
+workflows:
+  build-workflow:
+    jobs:
+      - say-hello  # This runs the basic "say hello" job.
+      - build      # This triggers the 'build' job for both backend and frontend tasks.
+      - sonarqube
+      # - security-scan:
+      #     requires:
+      #       - build  # Ensures that the security scan runs only after the 'build' job is complete.
