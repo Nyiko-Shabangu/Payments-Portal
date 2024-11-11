@@ -20,32 +20,25 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  });
-
 // Middleware
 app.use(express.json());
 
 //https://helmetjs.github.io/
-// Helmet configuration for security
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"], //
-            scriptSrc: ["'self'", "https://localhost:3000"], // 
-            objectSrc: ["'none'"], // 
-            upgradeInsecureRequests: [], 
-        },
-    },
-    frameguard: {
-        action: 'SAMEORIGIN', 
-    },
-    referrerPolicy: {
-        policy: 'no-referrer', 
-    },
-    xssFilter: true, 
+// Basic Helmet security setup with some custom configurations
+app.use(helmet());
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'"]
+  }
 }));
+app.use(helmet.xssFilter());
+app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true }));
+app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }));
+app.use(helmet.frameguard({ action: 'deny' }));
+app.use(helmet.noSniff());
+
 
 app.use(morgan('combined')); // Logging
 app.use(cors({ origin: 'http://localhost:3000' })); // Cross-Origin Resource Sharing
