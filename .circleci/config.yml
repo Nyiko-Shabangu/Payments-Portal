@@ -79,7 +79,7 @@ jobs:
           destination: frontend-build-log
             
   # Define the 'sonarqube' job for running SonarQube static code analysis.
-  sonarqube:
+ sonarqube:
     docker:
       - image: sonarsource/sonar-scanner-cli:latest
     steps:
@@ -103,6 +103,8 @@ jobs:
               -Dsonar.login="$SONAR_TOKEN" \
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
+
+
     
 
 
